@@ -1,0 +1,4 @@
+
+wjt -z m -p brightness -x $(light -G) | while read brightness; do
+	light -S $brightness
+done

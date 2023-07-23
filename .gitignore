@@ -30,3 +30,5 @@
 !.local/bin/dirmenu
 !.local/bin/status-bar
 !.local/bin/wp
+!.local/bin/backlight
+!.local/bin/volume
