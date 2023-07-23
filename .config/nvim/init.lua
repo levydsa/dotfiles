@@ -125,7 +125,9 @@ end
 autocmd({"TextChanged", "InsertLeave"}, {
   pattern = { '*' },
   callback = function()
-    if fn.expand('%') ~= "" then vim.cmd.update() end
+    if fn.expand('%') ~= "" and not vim.bo.readonly then
+      vim.cmd.update()
+    end
   end,
 })
 
