@@ -18,7 +18,31 @@ batstat=$(cat /sys/class/power_supply/BAT0/status)
 
 append " ${volume}"
 append "│"
-append " $batstat $batcap%"
+
+case $(( batcap / 10 )) in
+	0)  append "󰂎" ;;
+	1)  append "󰁺" ;;
+	2)  append "󰁻" ;;
+	3)  append "󰁼" ;;
+	4)  append "󰁽" ;;
+	5)  append "󰁾" ;;
+	6)  append "󰁿" ;;
+	7)  append "󰂀" ;;
+	8)  append "󰂁" ;;
+	9)  append "󰂂" ;;
+	10) append "󰁹" ;;
+esac
+
+case $batstat in
+	Discharging)  append "󰜮" ;;
+	Charging)     append "󰜷" ;;
+	Full)         ;;
+	*)            append $batstat ;;
+esac
+
+append "$batcap%"
+append "|"
+append "󰃞 $(light)"
 append "|"
 append " $uptime"
 append "│"
