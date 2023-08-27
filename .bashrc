@@ -20,3 +20,4 @@ alias neoc='neocities'
 alias shut='doas shutdown now'
 alias wget="wget --hsts-file=$XDG_DATA_HOME/wget-hsts"
 alias dof="git --git-dir=$HOME/.dotfiles --work-tree=$HOME"
+alias man="man -m $HOME/.local/share/man"
