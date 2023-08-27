@@ -34,10 +34,11 @@ case $(( batcap / 10 )) in
 esac
 
 case $batstat in
-	Discharging)  append "󰜮" ;;
-	Charging)     append "󰜷" ;;
-	Full)         ;;
-	*)            append $batstat ;;
+	"Not charging") append "" ;;
+	"Discharging") append "󰜮" ;;
+	"Charging") append "󰜷" ;;
+	"Full") ;;
+	*) append "$batstat" ;;
 esac
 
 append "$batcap%"
