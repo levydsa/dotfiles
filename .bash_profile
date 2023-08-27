@@ -42,6 +42,9 @@ export EDITOR="nvim"
 
 # Clean up $HOME
 
+# shell
+export HISTFILE="$XDG_DATA_HOME/history"
+
 # gforth
 export GFORTHHIST="$XDG_DATA_HOME/gforth-history"
 
