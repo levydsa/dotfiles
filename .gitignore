@@ -3,7 +3,7 @@
 # Maybe this turns to be inconveniente, but seems like a good solution to not
 # adding unwanted files to the repo
 
-/*
+/**
 
 !.gitignore
 !.xinitrc
@@ -12,21 +12,27 @@
 !.inputrc
 
 !.config/
-.config/*
+.config/**
 
 !.config/nvim/
-.config/nvim/*
-!.config/nvim/init.lua
+!.config/nvim/**
+.config/nvim/lazy-lock.json
 
-!.config/nvim/
 !.config/fontconfig/
+!.config/fontconfig/**
+
 !.config/shell/
+!.config/shell/**
+
 !.config/python/
+!.config/python/**
 
 !.local/
-.local/*
-!local/bin/
-.local/bin/*
+.local/**
+
+!.local/bin/
+.local/bin/**
+
 !.local/bin/dirmenu
 !.local/bin/status-bar
 !.local/bin/wp
