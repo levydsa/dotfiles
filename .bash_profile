@@ -67,4 +67,7 @@ export JULIA_DEPOT_PATH="$XDG_DATA_HOME/julia:$JULIA_DEPOT_PATH"
 # Puts '.python_history' somewhere else
 export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/startup.py"
 
+# Android SDK
+export ANDROID_HOME="$XDG_CONFIG_HOME/android"
+export ANDROID_SDK_HOME="$ANDROID_HOME/platforms/android-16/"
 
