@@ -7,42 +7,6 @@
 autocmd = vim.api.nvim_create_autocmd
 fn = vim.fn
 
-local ensure_packer = function()
-  local install_path = fn.stdpath('data')..'/site/pack/packer/start/packer.nvim'
-  if fn.empty(fn.glob(install_path)) > 0 then
-    fn.system({'git', 'clone', '--depth', '1', 'https://github.com/wbthomason/packer.nvim', install_path})
-    vim.cmd [[packadd packer.nvim]]
-    return true
-  end
-  return false
-end
-
-local packer_bootstrap = ensure_packer()
-local packer = require('packer')
-
-packer.startup(function(use)
-  -- packer
-  use 'wbthomason/packer.nvim'
-
-  -- fuzzy OwO
-  use {
-    'nvim-telescope/telescope.nvim', tag = '0.1.x',
-    requires = { {'nvim-lua/plenary.nvim'} }
-  }
-
-  -- general language support
-  use { 'nvim-treesitter/nvim-treesitter', run = ':TSUpdate' }
-  use 'simplosophy/vim-io'
-
-  -- color scheme
-  use { "bluz71/vim-moonfly-colors", as = "moonfly" }
-
-  if packer_bootstrap then
-    packer.sync()
-    packer.install()
-  end
-end)
-
 vim.opt.nu = true                     -- line numbers
 vim.opt.rnu = true                    -- show line number relative to cursor line
 vim.opt.redrawtime = 10000            -- more time to redraw (better for larger files)
@@ -67,14 +31,16 @@ vim.opt.listchars = { tab = '│ ' , trail = '~' }
 vim.opt.mouse = ""
 
 -- disable auto-comment
-vim.opt.formatoptions:remove({'c', 'r', 'o'}) 
+vim.opt.formatoptions:remove('c')
+vim.opt.formatoptions:remove('r')
+vim.opt.formatoptions:remove('o')
 
 -- who needs airline?
 function status()
+  local spell = vim.opt.spell
+  local langs = vim.opt.spelllang
   return ' %f %m%r%y '
-  .. (vim.opt.spell:get() and '[Spell ('
-  .. vim.inspect(vim.opt.spelllang:get())
-  .. ')]' or '')
+  .. (spell:get() and '[' .. table.concat(langs:get(), ', ') .. ']' or '')
   .. '%=(%l, %c) (0x%B) (%P) [%L] '
 end
 vim.opt.statusline = '%!v:lua.status()'
@@ -88,13 +54,18 @@ vim.opt.smartindent = true
 vim.opt.expandtab = false  -- don't expand tabs by default
 vim.opt.shiftwidth = 0     -- default to tabstop
 
--- leader is space
-vim.g.mapleader = ' '
+vim.g.mapleader = ' ' -- leader is space
+vim.g.c_syntax_for_h = true -- don't know why the default is cpp :/
 
--- don't know why the default is cpp
-vim.g.c_syntax_for_h = true
+-- (s)et s(p)ell
+vim.keymap.set('n', '<leader>sp', function()
+  vim.opt.spell = not(vim.opt.spell:get())
+end)
 
-vim.cmd.colorscheme('moonfly')
+-- (t)o(g)gle search
+vim.keymap.set('n', '<leader>tg', function()
+  fn.setreg('/', (fn.getreg('/') == '') and fn.expand("<cword>") or '')
+end)
 
 -- custom indentation per filetype
 local typecmd = {
@@ -128,33 +99,53 @@ autocmd({"TextChanged", "InsertLeave"}, {
   end,
 })
 
--- toggle search
-vim.keymap.set('n', '<F3>', function()
-  fn.setreg('/', (fn.getreg('/') == '') and fn.expand("<cword>") or '')
-end)
+local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
+if not vim.loop.fs_stat(lazypath) then
+  local lazyurl = "https://github.com/folke/lazy.nvim.git"
+  vim.fn.system({
+    "git", "clone", "--filter=blob:none", lazyurl, "--branch=stable", lazypath,
+  })
+end
+vim.opt.rtp:prepend(lazypath)
 
--- telescope config
-local builtin = require('telescope.builtin')
-vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
-
--- treesitter config
-require('nvim-treesitter.configs').setup {
-  -- install others as you go
-  ensure_installed = { "c", "cpp", "lua", "vim", "python" },
-  sync_install = false,
-  auto_install = false,
-  highlight = {
-    enable = true,
-    disable = function(lang, buf)
-      local max_filesize = 100 * 1024 -- 100 KiB
-      local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
-      if ok and stats and stats.size > max_filesize then
-        return true
-      end
+require("lazy").setup({
+  {
+    "nvim-telescope/telescope.nvim", -- fuzzy OwO
+    branch = '0.1.x',
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local builtin = require('telescope.builtin')
+      vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
+      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
+      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
+      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+    end
+  },
+  {
+    "bluz71/vim-moonfly-colors",
+    name = "moonfly",
+    lazy = false,
+    priority = 1000,
+    config = function()
+      vim.cmd.colorscheme("moonfly")
     end,
   },
-}
-
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate",
+    config = function()
+      require('nvim-treesitter.configs').setup {
+        ensure_installed = { "zig", "c", "cpp", "lua", "vim", "python" },
+        sync_install = false,
+        auto_install = false,
+        highlight = { enable = true },
+      }
+    end,
+  },
+  {
+    "lukas-reineke/indent-blankline.nvim",
+    config = function()
+      require("indent_blankline").setup{}
+    end,
+  }
+})
