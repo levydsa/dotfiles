@@ -18,6 +18,8 @@
 !.config/nvim/**
 .config/nvim/lazy-lock.json
 
+!.config/user-dirs.dirs
+
 !.config/fontconfig/
 !.config/fontconfig/**
 
