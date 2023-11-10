@@ -7,6 +7,7 @@
 autocmd = vim.api.nvim_create_autocmd
 fn = vim.fn
 
+
 vim.opt.nu = true                     -- line numbers
 vim.opt.rnu = true                    -- show line number relative to cursor line
 vim.opt.redrawtime = 10000            -- more time to redraw (better for larger files)
@@ -17,7 +18,7 @@ vim.opt.ignorecase = true             -- ignore case sensitive search
 vim.opt.smartcase = true              -- overwrite 'ignorecase' if search has upper case chars
 vim.opt.hlsearch = true               -- highlight search
 vim.opt.updatetime = 300              -- swap write to disk delay
-vim.opt.signcolumn = 'auto'           -- automatic signs
+vim.opt.signcolumn = 'yes:1'           -- automatic signs
 vim.opt.colorcolumn = {81}            -- color column
 vim.opt.encoding = 'utf-8'            -- utf-8 encoding
 vim.opt.spelllang = {'en_us','pt_br'} -- spell check English and Brazilian Portuguese
@@ -53,6 +54,7 @@ vim.opt.backup      = false
 vim.opt.smartindent = true
 vim.opt.expandtab = false  -- don't expand tabs by default
 vim.opt.shiftwidth = 0     -- default to tabstop
+vim.opt.tabstop = 4        -- 4 spaces indent
 
 vim.g.mapleader = ' ' -- leader is space
 vim.g.c_syntax_for_h = true -- don't know why the default is cpp :/
@@ -67,6 +69,18 @@ vim.keymap.set('n', '<leader>tg', function()
   fn.setreg('/', (fn.getreg('/') == '') and fn.expand("<cword>") or '')
 end)
 
+vim.keymap.set('t', '<esc>', '<c-\\><c-n>')
+vim.keymap.set('t', '<leader>gb', function()
+  vim.cmd.pop();
+end)
+
+vim.fn.sign_define({
+  { name = "DiagnosticSignError", texthl = "DiagnosticSignError", text = "" },
+  { name = "DiagnosticSignHint",  texthl = "DiagnosticSignHint",  text = "" },
+  { name = "DiagnosticSignWarn",  texthl = "DiagnosticSignWarn",  text = "" },
+  { name = "DiagnosticSignInfo",  texthl = "DiagnosticSignInfo",  text = "" },
+})
+
 -- custom indentation per filetype
 local typecmd = {
   html = [[ setlocal ts=2 ]],
@@ -76,8 +90,6 @@ local typecmd = {
   vim  = [[ setlocal ts=2 ]],
   sh   = [[ setlocal ts=2 ]],
   asm  = [[ setlocal ts=2 ]],
-  go   = [[ setlocal ts=4 ]],
-  cpp  = [[ setlocal ts=4 ]],
   lua  = [[ setlocal ts=2 et ]],
   elm  = [[ setlocal ts=2 et ]],
   javascript = [[ setlocal ts=4 et ]],
@@ -93,8 +105,8 @@ end
 autocmd({"TextChanged", "InsertLeave"}, {
   pattern = { '*' },
   callback = function()
-    if fn.expand('%') ~= "" and not vim.bo.readonly then
-      vim.cmd.update()
+    if fn.expand('%') ~= "" and not vim.bo.readonly and vim.bo then
+      vim.cmd([[silent! update]])
     end
   end,
 })
@@ -143,9 +155,26 @@ require("lazy").setup({
     end,
   },
   {
+    "neovim/nvim-lspconfig",
+    config = function()
+      local lspconfig = require("lspconfig")
+      lspconfig.zls.setup{}
+      lspconfig.hls.setup{}
+
+      autocmd('LspAttach', {
+        callback = function(event)
+          local opts = { buffer = event.buf }
+          vim.keymap.set("n", "<leader>gd", vim.lsp.buf.declaration, opts)
+          vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+          vim.keymap.set("i", "<tab>", vim.lsp.buf.completion, opts)
+        end
+      })
+    end,
+  },
+  {
     "lukas-reineke/indent-blankline.nvim",
     config = function()
-      require("indent_blankline").setup{}
+      require("ibl").setup{}
     end,
   }
 })
