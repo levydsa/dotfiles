@@ -7,7 +7,6 @@
 autocmd = vim.api.nvim_create_autocmd
 fn = vim.fn
 
-
 vim.opt.nu = true                     -- line numbers
 vim.opt.rnu = true                    -- show line number relative to cursor line
 vim.opt.redrawtime = 10000            -- more time to redraw (better for larger files)
@@ -18,7 +17,7 @@ vim.opt.ignorecase = true             -- ignore case sensitive search
 vim.opt.smartcase = true              -- overwrite 'ignorecase' if search has upper case chars
 vim.opt.hlsearch = true               -- highlight search
 vim.opt.updatetime = 300              -- swap write to disk delay
-vim.opt.signcolumn = 'yes:1'           -- automatic signs
+vim.opt.signcolumn = 'yes:1'          -- automatic signs
 vim.opt.colorcolumn = {81}            -- color column
 vim.opt.encoding = 'utf-8'            -- utf-8 encoding
 vim.opt.spelllang = {'en_us','pt_br'} -- spell check English and Brazilian Portuguese
@@ -26,15 +25,10 @@ vim.opt.showtabline = 2               -- always show the tab line
 
 -- Show tabs and trailing spaces
 vim.opt.list = true
-vim.opt.listchars = { tab = '│ ' , trail = '~' }
+vim.opt.listchars = { tab = "⯈ ", trail = "~" }
 
--- disable mouse
 vim.opt.mouse = ""
-
--- disable auto-comment
-vim.opt.formatoptions:remove('c')
-vim.opt.formatoptions:remove('r')
-vim.opt.formatoptions:remove('o')
+autocmd("FileType", { pattern = { "*" }, command = [[setlocal fo-=cro]] })
 
 -- who needs airline?
 function status()
@@ -52,7 +46,7 @@ vim.opt.backup      = false
 
 -- indentation
 vim.opt.smartindent = true
-vim.opt.expandtab = false  -- don't expand tabs by default
+vim.opt.expandtab = true  -- don't expand tabs by default
 vim.opt.shiftwidth = 0     -- default to tabstop
 vim.opt.tabstop = 4        -- 4 spaces indent
 
@@ -90,11 +84,11 @@ local typecmd = {
   vim  = [[ setlocal ts=2 ]],
   sh   = [[ setlocal ts=2 ]],
   asm  = [[ setlocal ts=2 ]],
-  lua  = [[ setlocal ts=2 et ]],
-  elm  = [[ setlocal ts=2 et ]],
-  javascript = [[ setlocal ts=4 et ]],
-  markdown = [[ setlocal ts=4 et ]],
-  haskell = [[ setlocal ts=4 et ]],
+  lua  = [[ setlocal ts=2 ]],
+  elm  = [[ setlocal ts=2 ]],
+  javascript = [[ setlocal ts=4 ]],
+  markdown = [[ setlocal ts=4 ]],
+  haskell = [[ setlocal ts=4 ]],
 }
 
 for filetype, cmd in pairs(typecmd) do
@@ -123,14 +117,14 @@ vim.opt.rtp:prepend(lazypath)
 require("lazy").setup({
   {
     "nvim-telescope/telescope.nvim", -- fuzzy OwO
-    branch = '0.1.x',
+    branch = "0.1.x",
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
-      local builtin = require('telescope.builtin')
-      vim.keymap.set('n', '<leader>ff', builtin.find_files, {})
-      vim.keymap.set('n', '<leader>fg', builtin.live_grep, {})
-      vim.keymap.set('n', '<leader>fb', builtin.buffers, {})
-      vim.keymap.set('n', '<leader>fh', builtin.help_tags, {})
+      local builtin = require("telescope.builtin")
+      vim.keymap.set("n", "<leader>ff", builtin.find_files, {})
+      vim.keymap.set("n", "<leader>fg", builtin.live_grep, {})
+      vim.keymap.set("n", "<leader>fb", builtin.buffers, {})
+      vim.keymap.set("n", "<leader>fh", builtin.help_tags, {})
     end
   },
   {
@@ -147,7 +141,7 @@ require("lazy").setup({
     build = ":TSUpdate",
     config = function()
       require('nvim-treesitter.configs').setup {
-        ensure_installed = { "zig", "c", "cpp", "lua", "vim", "python" },
+        ensure_installed = { "zig", "c", "cpp", "lua", "python" },
         sync_install = false,
         auto_install = false,
         highlight = { enable = true },
@@ -158,15 +152,15 @@ require("lazy").setup({
     "neovim/nvim-lspconfig",
     config = function()
       local lspconfig = require("lspconfig")
-      lspconfig.zls.setup{}
-      lspconfig.hls.setup{}
 
-      autocmd('LspAttach', {
+      lspconfig.zls.setup{}
+
+      autocmd("LspAttach", {
         callback = function(event)
           local opts = { buffer = event.buf }
           vim.keymap.set("n", "<leader>gd", vim.lsp.buf.declaration, opts)
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-          vim.keymap.set("i", "<tab>", vim.lsp.buf.completion, opts)
+          vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
         end
       })
     end,
@@ -176,5 +170,39 @@ require("lazy").setup({
     config = function()
       require("ibl").setup{}
     end,
-  }
+  },
+  {
+    "ThePrimeagen/harpoon",
+    branch = "harpoon2",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = function()
+      local harpoon = require("harpoon")
+      harpoon:setup()
+
+      vim.keymap.set("n", "<leader>a", function() harpoon:list():append() end);
+      vim.keymap.set("n", "<C-e>", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end);
+      vim.keymap.set("n", "<leader>1", function() harpoon:list():select(1) end);
+      vim.keymap.set("n", "<leader>2", function() harpoon:list():select(2) end);
+      vim.keymap.set("n", "<leader>3", function() harpoon:list():select(3) end);
+    end,
+  },
+  {
+    "echasnovski/mini.move",
+    version = false,
+    config = function()
+      require('mini.move').setup({
+        mappings = {
+          left = '<C-h>',
+          right = '<C-l>',
+          down = '<C-j>',
+          up = '<C-k>',
+
+          line_left = '<C-h>',
+          line_right = '<C-l>',
+          line_down = '<C-j>',
+          line_up = '<C-k>',
+        },
+      })
+    end
+  },
 })
