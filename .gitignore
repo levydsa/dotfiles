@@ -29,6 +29,15 @@
 !.config/python/
 !.config/python/**
 
+!.config/dunst/
+!.config/dunst/**
+
+!.config/autostart/
+!.config/autostart/**
+
+!.config/systemd/
+!.config/systemd/**
+
 !.local/
 .local/**
 
@@ -40,3 +49,4 @@
 !.local/bin/wp
 !.local/bin/backlight
 !.local/bin/volume
+

@@ -1,0 +1,11 @@
+
+[global]
+	highlight="#fff"
+	foreground="#fff"
+	background="#000"
+	
+	frame_width=2
+	frame_color="#fff"
+
+	separator_color="#888"
+

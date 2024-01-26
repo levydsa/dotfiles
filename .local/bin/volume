@@ -1,3 +1,26 @@
+#!/usr/bin/env sh
+
+case "$1" in
+	-t)
+		pamixer -t
+		case $(pamixer --get-mute) in
+			"true") msg="muted" ;;
+			"false") msg="unmuted" ;;
+		esac
+		notify-send -t 1000 volume "$msg"
+		exit
+		;;
+	+*)
+		pamixer -i ${1#+}
+		notify-send -t 1000 -h int:value:$(pamixer --get-volume) volume
+		exit
+		;;
+	-*)
+		pamixer -d ${1#-}
+		notify-send -t 1000 -h int:value:$(pamixer --get-volume) volume
+		exit
+		;;
+esac
 
 wjt -z m -p volume -x $(pamixer --get-volume) | while read volume; do
 	case "$volume" in

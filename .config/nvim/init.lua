@@ -24,8 +24,8 @@ vim.opt.spelllang = {'en_us','pt_br'} -- spell check English and Brazilian Portu
 vim.opt.showtabline = 2               -- always show the tab line
 
 -- Show tabs and trailing spaces
+vim.opt.listchars:append({ trail = "~", tab = "┃ ", space = "·" })
 vim.opt.list = true
-vim.opt.listchars = { tab = "⯈ ", trail = "~" }
 
 vim.opt.mouse = ""
 autocmd("FileType", { pattern = { "*" }, command = [[setlocal fo-=cro]] })
@@ -46,9 +46,9 @@ vim.opt.backup      = false
 
 -- indentation
 vim.opt.smartindent = true
-vim.opt.expandtab = true  -- don't expand tabs by default
-vim.opt.shiftwidth = 0     -- default to tabstop
-vim.opt.tabstop = 4        -- 4 spaces indent
+vim.opt.expandtab = false  -- don't expand tabs by default
+vim.opt.shiftwidth = 0    -- default to tabstop
+vim.opt.tabstop = 4       -- 4 spaces indent
 
 vim.g.mapleader = ' ' -- leader is space
 vim.g.c_syntax_for_h = true -- don't know why the default is cpp :/
@@ -77,18 +77,14 @@ vim.fn.sign_define({
 
 -- custom indentation per filetype
 local typecmd = {
-  html = [[ setlocal ts=2 ]],
-  tex  = [[ setlocal ts=2 ]],
-  css  = [[ setlocal ts=2 ]],
-  xml  = [[ setlocal ts=2 ]],
-  vim  = [[ setlocal ts=2 ]],
-  sh   = [[ setlocal ts=2 ]],
-  asm  = [[ setlocal ts=2 ]],
-  lua  = [[ setlocal ts=2 ]],
-  elm  = [[ setlocal ts=2 ]],
-  javascript = [[ setlocal ts=4 ]],
-  markdown = [[ setlocal ts=4 ]],
-  haskell = [[ setlocal ts=4 ]],
+  html = [[ setlocal ts=2 et ]],
+  tex  = [[ setlocal ts=2 et ]],
+  css  = [[ setlocal ts=2 et ]],
+  xml  = [[ setlocal ts=2 et ]],
+  sh   = [[ setlocal ts=2 et ]],
+  asm  = [[ setlocal ts=2 et ]],
+  lua  = [[ setlocal ts=2 et ]],
+  elm  = [[ setlocal ts=2 et ]],
 }
 
 for filetype, cmd in pairs(typecmd) do
@@ -154,13 +150,19 @@ require("lazy").setup({
       local lspconfig = require("lspconfig")
 
       lspconfig.zls.setup{}
+      lspconfig.clangd.setup{}
+      lspconfig.rust_analyzer.setup{}
 
       autocmd("LspAttach", {
         callback = function(event)
           local opts = { buffer = event.buf }
+          vim.print(vim.inspect(event.buf))
+
           vim.keymap.set("n", "<leader>gd", vim.lsp.buf.declaration, opts)
+          vim.keymap.set("n", "<leader>gi", vim.lsp.buf.implementation, opts)
           vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
           vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+          vim.keymap.set("n", "<leader>f", vim.lsp.buf.format, opts)
         end
       })
     end,
@@ -168,7 +170,13 @@ require("lazy").setup({
   {
     "lukas-reineke/indent-blankline.nvim",
     config = function()
-      require("ibl").setup{}
+      require("ibl").setup{
+				indent = { char = "┃" },
+				scope = {
+					show_start = false,
+					show_end = false,
+				}
+			}
     end,
   },
   {
