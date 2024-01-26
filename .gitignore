@@ -8,7 +8,7 @@
 !.gitignore
 !.xinitrc
 !.bashrc
-!.bash_profile
+!.profile
 !.inputrc
 
 !.config/
