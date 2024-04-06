@@ -40,6 +40,9 @@
 !.config/autostart/
 !.config/autostart/**
 
+!.config/zsh/
+!.config/zsh/**
+
 !.config/wofi/
 !.config/wofi/**
 
