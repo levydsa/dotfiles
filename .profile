@@ -1,5 +1,7 @@
 #!/bin/sh
 
+# This script will be executed by greetd on login.
+
 # Append "$1" to $PATH when not already in.
 # This function was taken from /etc/profile
 append_path() {
@@ -22,9 +24,11 @@ prepend_path() {
 
 append_path "$HOME/.local/bin"
 append_path "$HOME/.local/share/gem/ruby/3.0.0/bin"
+append_path "$HOME/.local/share/go/bin/"
 prepend_path "$CARGO_HOME/bin"
 
 unset -f append_path
+unset -f prepend_path
 
 #
 # XDG Base Directory
@@ -37,7 +41,7 @@ export XDG_DATA_HOME="$HOME/.local/share"
 export XDG_STATE_HOME="$HOME/.local/state"
 
 # System directories
-export XDG_DATA_DIRS="/usr/local/share:/usr/share"
+export XDG_DATA_DIRS="/usr/local/share:/usr/share:$HOME/.local/share/flatpak/exports/share:/var/lib/flatpak/exports/share"
 export XDG_CONFIG_DIRS="/etc/xdg"
 
 #
@@ -45,8 +49,10 @@ export XDG_CONFIG_DIRS="/etc/xdg"
 #
 
 export EDITOR="nvim"
-export TERMINAL="st"
+export TERMINAL="alacritty"
 export BROWSER="chromium"
+
+export ZDOTDIR="$XDG_CONFIG_HOME/zsh"
 
 # Dark theme (https://wiki.archlinux.org/title/Dark_mode_switching)
 export GTK_THEME="Adwaita:dark"
@@ -76,11 +82,10 @@ export TEXMFCONFIG="$XDG_CONFIG_HOME/texlive/texmf-config"
 # Julia
 export JULIA_DEPOT_PATH="$XDG_DATA_HOME/julia:$JULIA_DEPOT_PATH"
 
-# Python
-
 # Puts '.python_history' somewhere else
 export PYTHONSTARTUP="$XDG_CONFIG_HOME/python/startup.py"
 
-# Android SDK
 export ANDROID_HOME="$XDG_DATA_HOME/android"
+
+export GRADLE_USER_HOME="$XDG_DATA_HOME/gradle"
 

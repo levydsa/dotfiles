@@ -14,6 +14,8 @@
 !.config/
 .config/**
 
+!alacritty.toml
+
 !.config/nvim/
 !.config/nvim/**
 .config/nvim/lazy-lock.json
@@ -32,8 +34,20 @@
 !.config/dunst/
 !.config/dunst/**
 
+!.config/paru/
+!.config/paru/**
+
 !.config/autostart/
 !.config/autostart/**
+
+!.config/wofi/
+!.config/wofi/**
+
+!.config/waybar/
+!.config/waybar/**
+
+!.config/river/
+!.config/river/**
 
 !.config/systemd/
 !.config/systemd/**
@@ -44,9 +58,6 @@
 !.local/bin/
 .local/bin/**
 
-!.local/bin/dirmenu
-!.local/bin/status-bar
-!.local/bin/wp
 !.local/bin/backlight
 !.local/bin/volume
 

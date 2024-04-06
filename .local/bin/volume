@@ -1,30 +1,26 @@
 #!/usr/bin/env sh
 
+set -xe
+
 case "$1" in
 	-t)
-		pamixer -t
-		case $(pamixer --get-mute) in
-			"true") msg="muted" ;;
-			"false") msg="unmuted" ;;
+    wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle
+    
+    status="$(wpctl get-volume @DEFAULT_SINK@ | cut -d " " -f 3)"
+
+		case $status in
+			"[MUTED]") msg="muted" ;;
+			"") msg="unmuted" ;;
 		esac
+
 		notify-send -t 1000 volume "$msg"
-		exit
 		;;
-	+*)
-		pamixer -i ${1#+}
-		notify-send -t 1000 -h int:value:$(pamixer --get-volume) volume
-		exit
-		;;
-	-*)
-		pamixer -d ${1#-}
-		notify-send -t 1000 -h int:value:$(pamixer --get-volume) volume
-		exit
+	*)
+    wpctl set-volume @DEFAULT_SINK@ $1
+
+    value=$(wpctl get-volume @DEFAULT_SINK@ | cut -d " " -f 2)
+    volume=$(echo "$value * 100" | bc | xargs printf "%.0f")
+
+		notify-send -t 1000 -h int:value:$volume volume
 		;;
 esac
-
-wjt -z m -p volume -x $(pamixer --get-volume) | while read volume; do
-	case "$volume" in
-		m) pamixer -t ;;
-		*) pamixer --set-volume $volume ;;
-	esac
-done
